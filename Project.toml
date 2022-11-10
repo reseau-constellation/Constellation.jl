@@ -1,6 +1,6 @@
 name = "Constellation"
 uuid = "12cd0da3-566c-4730-bd56-a37e9f18d9f8"
-authors = ["julienmalard <julien.malard@mail.mcgill.ca> and contributors"]
+authors = ["Julien Jean Malard-Adam <julien.malard@mail.mcgill.ca> et al."]
 version = "0.1.0"
 
 [compat]
