@@ -3,6 +3,9 @@ uuid = "12cd0da3-566c-4730-bd56-a37e9f18d9f8"
 authors = ["Julien Jean Malard-Adam <julien.malard@mail.mcgill.ca> et al."]
 version = "0.1.0"
 
+[deps]
+WebSockets = "104b5d7c-a370-577a-8038-80a2059c5097"
+
 [compat]
 julia = "1"
 
