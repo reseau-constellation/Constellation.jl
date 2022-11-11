@@ -18,7 +18,3 @@ function lancerServeur(port::Int=0, exe::String="constl")
         end
     end
 end
-
-function fermerServeur()
-
-end

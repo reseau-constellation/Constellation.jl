@@ -1,6 +1,6 @@
 module Constellation
 
 include("serveur.jl")
-export lancerServeur, obtVersionServeur, versionValide
+export lancerServeur, obtVersionServeur
 
 end
