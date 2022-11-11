@@ -4,6 +4,10 @@ using Test
 
     @testset "Serveur" begin
         include("testServeur.jl");sleep(1)
-     end
+    end
+
+    @testset "Client" begin
+        include("testClient.jl");sleep(1)
+    end
 
 end
