@@ -1,9 +1,9 @@
 module Constellation
 
 include("serveur.jl")
-export lancerServeur, obtVersionServeur
+export avecServeur, lancerServeur, obtVersionServeur
 
 include("client.jl")
-export Client
+export avecClient, Client
 
 end

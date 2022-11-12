@@ -15,7 +15,7 @@ function estNumérique(x)
     return tryparse(Float64, x) != nothing
 end
 
-function lancerServeurTest(f::Function)
+function avecServeurTest(f::Function)
     Base.Filesystem.mktempdir() do dossier
         Constellation.avecServeur(dossierOrbite=dossier, dossierSFIP=dossier) do port
             f(port)
@@ -31,4 +31,4 @@ function attendreDossierExiste(dossier::AbstractString)
     end
 end
 
-export versionValide, estNumérique, lancerServeurTest, attendreDossierExiste
+export versionValide, estNumérique, lancerServeurTest, avecServeurTest

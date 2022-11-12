@@ -1,13 +1,17 @@
 include("utils.jl")
 
-lancerServeurTest() do (port)
-    println("ici", 1)
-    client = Constellation.Client(port)
+avecServeurTest() do (port)
+    Constellation.avecClient(port) do client
+        
+        idCompte = Constellation.action(client, "obtIdCompte")
+        println("idCompte ", idCompte)
+        @test occursin("orbitdb", idCompte)
 
-    # idCompte = @sync Constellation.action(client, "obtIdCompte")
-    # println("idCompte", idCompte)
-    # idBd = Constellation.action(client, "bds.créerBd", Dict([("licence", "ODbl-1_0")]))
-    # println("ici", 4)
+        idBd = Constellation.action(client, "bds.créerBd", Dict([("licence", "ODbl-1_0")]))
+        @test occursin("orbitdb", idBd)
+
+        
+    end
 end
 """
 idTableau = Constellation.action(client, "bds.ajouterTableauBd", args=Dict([("idBd", idBd)]))
