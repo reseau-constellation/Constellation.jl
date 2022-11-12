@@ -43,6 +43,18 @@ function attendreRéponse(client::Client, id::AbstractString, type::AbstractStri
     cond
 end
 
+function suivreRéponse(f::Function, client::Client, id::AbstractString, type::AbstractString)
+    function fMessage(message)
+        if message["id"] == id && message["type"] == type
+            f(message["données"])
+        end
+    end
+
+    lorsque(client.émetteur, "message", fFinale)
+    
+    () -> oublierLorsque(client.émetteur, "message", fFinale)
+end
+
 function action(client::Client, adresseFonction::String, args::Dict)
     # Créer requète
     id = string(UUIDs.uuid4())
@@ -64,44 +76,52 @@ function action(client::Client, adresseFonction::String)
     action(client, adresseFonction, Dict())
 end
 
-
-"""
-function suivre(f::Fonction, client::Client, adresseFonction::String, args::Dict{String, Any})
+function suivre(f::Function, client::Client, adresseFonction::String, args::Dict{String, Any})
     # Créer requète
     id = UUIDs.uuidv4()
-    requète = Dict([("id", id), ()])
+    nomArgFonction = 
+    requète = Dict([
+        ("id", id), ("type", "suivre"), ("fonction", split(adresseFonction, ".")), ("args", args),
+        ("nomArgFonction", nomArgFonction)
+    ])
 
     # Créer écoute réponse suivrePrêt sur client
-    attendrePrêt = attendreRéponse(client, id, "suiviPrêt")
+    suiviPrêt = attendreRéponse(client, id, "suiviPrêt")
     
     # Créer écoute réponse données sur client
-    oublierÉcoute = lorsqueRéponse(client, id, "suivi", écoute)
+    oublierÉcoute = suivreRéponse(client, id, "suivre") do réponse
+        f(réponse)
+    end
     
     # Envoyer requète au client
-    requète = Dict([
-        ("type", "suivi"), ("fonction", adresseFonction), ("args", args), ("id", id)
-    ])
-    
-    # Créer fonction oublier
-    requèteOublier = Dict([
-        ("type", "oublier"), ("id", id)
-    ])
-    # fOublier = () -> { put!(client.ws, JSON.json(requèteOublier)), oublierÉcoute() }
+    write(client.ws, JSON.json(requète))
 
     # Attendre réponse requète et rendre la fonction oublier
-    wait(attendrePrêt)
-    # fOublier
+    wait(suiviPrêt)
+    
+    # Rendre fonction oublier
+    requèteOublier = Dict([
+        ("type", "retour"), ("id", id), ("fonction", "fOublier")
+    ])
+
+    function fOublier()
+        write(client.ws, JSON.json(requèteOublier))
+        oublierÉcoute()
+    end
 end
 
 
 function suivreUneFois(client::Client, adresseFonction::String, args::Dict{String, Any})
-    # Créer canal écoute
-    
+    # Créer condition écoute
+    cond = Condition()
+
     # Appeler suivre
-    fOublier = suivre(client, adresseFonction, args, canal)
+    fOublier = suivre(client, adresseFonction, args) do résultat
+        notify(cond, résultat)
+    end
     
     # Lorsque première réponse, annuler tout
-    résultat = wait(canal)
+    résultat = wait(cond)
     fOublier()
     
     # Rendre la réponse
@@ -123,4 +143,3 @@ end
 function obtDonnéesRéseau()
 
 end
-"""

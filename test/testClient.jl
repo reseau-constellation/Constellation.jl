@@ -16,8 +16,9 @@ end
 idTableau = Constellation.action(client, "bds.ajouterTableauBd", args=Dict([("idBd", idBd)]))
 Constellation.action(client, "bds.ajouterNomsBd", args=Dict([("idBd", idBd), ("noms", Dict([("fr": "Météo"), ("த", "காலநிலை")]))]))
 
-noms = nothing
-fOublier = Constellation.suivre(client, "bds.suivreNomsBd", x->noms=x)
+fOublier = Constellation.suivre(client, "bds.suivreNomsBd", x->noms=x) do noms
+    
+end
 
 fOublier()
 
