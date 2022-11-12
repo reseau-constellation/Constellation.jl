@@ -17,10 +17,18 @@ end
 
 function lancerServeurTest(f::Function)
     Base.Filesystem.mktempdir() do dossier
-        (port, fermerServeur) = Constellation.lancerServeur(dossierOrbite=dossier, dossierSFIP=dossier)
-        f((port, fermerServeur))
-        fermerServeur()
+        Constellation.avecServeur(dossierOrbite=dossier, dossierSFIP=dossier) do port
+            f(port)
+        end
     end
 end
 
-export versionValide, estNumérique, lancerServeurTest
+function attendreDossierExiste(dossier::AbstractString)
+    while true
+        if isdir(dossier)
+            return
+        end
+    end
+end
+
+export versionValide, estNumérique, lancerServeurTest, attendreDossierExiste

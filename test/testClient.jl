@@ -1,6 +1,6 @@
 include("utils.jl")
 
-lancerServeurTest() do (port, fermerServeur)
+lancerServeurTest() do (port)
     println("ici", 1)
     client = Constellation.Client(port)
 
