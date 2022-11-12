@@ -4,6 +4,6 @@ include("serveur.jl")
 export avecServeur, lancerServeur, obtVersionServeur
 
 include("client.jl")
-export avecClient, Client
+export avecClient, Client, suivre, action
 
 end
