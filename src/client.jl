@@ -15,9 +15,6 @@ end
 
 function avecClient(f::Function, port::Int)
     client = Client(;port=port, émetteur=Émetteur())
-    lorsque(client.émetteur, "message") do message
-        println("reçu", message)
-    end
 
     WebSockets.open(string("ws://localhost:", port)) do ws_client
         client.ws = ws_client
@@ -40,7 +37,6 @@ function attendreRéponse(client::Client, id::AbstractString, type::AbstractStri
 
     lorsque(client.émetteur, "message") do message
         if message["id"] == id && message["type"] == type
-            println("attendreRéponse", message, message["résultat"])
             notify(cond, message["résultat"])
         end
     end
@@ -70,7 +66,7 @@ end
 
 
 """
-function suivre(client::Client, adresseFonction::String, args::Dict{String, Any}, f::Fonction)
+function suivre(f::Fonction, client::Client, adresseFonction::String, args::Dict{String, Any})
     # Créer requète
     id = UUIDs.uuidv4()
     requète = Dict([("id", id), ()])

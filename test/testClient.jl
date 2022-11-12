@@ -4,15 +4,14 @@ avecServeurTest() do (port)
     Constellation.avecClient(port) do client
         
         idCompte = Constellation.action(client, "obtIdCompte")
-        println("idCompte ", idCompte)
         @test occursin("orbitdb", idCompte)
 
         idBd = Constellation.action(client, "bds.créerBd", Dict([("licence", "ODbl-1_0")]))
         @test occursin("orbitdb", idBd)
 
-        
     end
 end
+
 """
 idTableau = Constellation.action(client, "bds.ajouterTableauBd", args=Dict([("idBd", idBd)]))
 Constellation.action(client, "bds.ajouterNomsBd", args=Dict([("idBd", idBd), ("noms", Dict([("fr": "Météo"), ("த", "காலநிலை")]))]))
