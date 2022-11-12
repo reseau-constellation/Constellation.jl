@@ -37,7 +37,11 @@ function attendreRéponse(client::Client, id::AbstractString, type::AbstractStri
 
     lorsque(client.émetteur, "message") do message
         if message["id"] == id && message["type"] == type
-            notify(cond, message["résultat"])
+            if "résultat" in keys(message)
+                notify(cond, message["résultat"])
+            else
+                notify(cond)
+            end
         end
     end
     cond

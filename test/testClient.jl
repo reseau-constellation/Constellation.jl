@@ -9,15 +9,16 @@ avecServeurTest() do (port)
         idBd = Constellation.action(client, "bds.créerBd", Dict([("licence", "ODbl-1_0")]))
         @test occursin("orbitdb", idBd)
 
+        idTableau = Constellation.action(client, "bds.ajouterTableauBd", Dict([("idBd", idBd)]))
+        Constellation.action(client, "bds.ajouterNomsBd", Dict([("id", idBd), ("noms", Dict([("fr", "Météo"), ("த", "காலநிலை")]))]))
+
     end
 end
 
 """
-idTableau = Constellation.action(client, "bds.ajouterTableauBd", args=Dict([("idBd", idBd)]))
-Constellation.action(client, "bds.ajouterNomsBd", args=Dict([("idBd", idBd), ("noms", Dict([("fr": "Météo"), ("த", "காலநிலை")]))]))
 
 fOublier = Constellation.suivre(client, "bds.suivreNomsBd", x->noms=x) do noms
-    
+
 end
 
 fOublier()
@@ -28,4 +29,3 @@ Constellation.rechercher(client, "recherche.rechercherVariablesSelonNom")
 données = Constellation.obtDonnéesTableau(client, idTableau)
 # donnéesRéseau = Constellation.obtDonnéesRéseau()
 """
-fermerServeur()
