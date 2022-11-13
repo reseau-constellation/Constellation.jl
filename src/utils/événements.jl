@@ -28,9 +28,9 @@ end
 oublierLorsque(e::Émetteur, nom::AbstractString, f::Function) = begin
   haskey(e, nom) || return
   if isa(e[nom], Function)
-    is(e[nom], f) && delete!(e, nom)
+    (e[nom] ≡ f) && delete!(e, nom)
   else
-    filter!(x -> !is(x, f), e[nom])
+    filter!(x -> !(x ≡ f), e[nom])
   end
 end
 

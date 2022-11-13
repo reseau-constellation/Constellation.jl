@@ -11,15 +11,26 @@ avecServeurTest() do (port)
 
         idTableau = Constellation.action(client, "bds.ajouterTableauBd", Dict([("idBd", idBd)]))
         Constellation.action(client, "bds.ajouterNomsBd", Dict([("id", idBd), ("noms", Dict([("fr", "Météo"), ("த", "காலநிலை")]))]))
+        
+        dicNoms = Dict([])
+        fOublier = Constellation.suivre(client, "bds.suivreNomsBd", Dict([("id", idBd)])) do noms
+            dicNoms = noms
+        end
+        @test dicNoms["fr"] == "Météo" && dicNoms["த"] == "காலநிலை"
+        
+        Constellation.action(client, "bds.ajouterNomsBd", Dict([("id", idBd), ("noms", Dict([("es", "Meteo")]))]))
+        @test dicNoms["es"] == "Meteo"
 
+        fOublier()
+
+        Constellation.action(client, "bds.ajouterNomsBd", Dict([("id", idBd), ("noms", Dict([("हिं", "मौसम")]))]))
+        @test !haskey(dicNoms, "हिं")
     end
 end
 
 """
 
-fOublier = Constellation.suivre(client, "bds.suivreNomsBd", x->noms=x) do noms
 
-end
 
 fOublier()
 

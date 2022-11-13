@@ -35,8 +35,9 @@ end
 function attendreRéponse(client::Client, id::AbstractString, type::AbstractString)
     cond = Condition()
 
-    lorsque(client.émetteur, "message") do message
+    f(message) = begin
         if message["id"] == id && message["type"] == type
+            oublierLorsque(client.émetteur, "message", f)
             if "résultat" in keys(message)
                 notify(cond, message["résultat"])
             else
@@ -44,6 +45,8 @@ function attendreRéponse(client::Client, id::AbstractString, type::AbstractStri
             end
         end
     end
+
+    lorsque(client.émetteur, "message", f)
     cond
 end
 
@@ -54,9 +57,9 @@ function suivreRéponse(f::Function, client::Client, id::AbstractString, type::A
         end
     end
 
-    lorsque(client.émetteur, "message", fFinale)
+    lorsque(client.émetteur, "message", fMessage)
     
-    () -> oublierLorsque(client.émetteur, "message", fFinale)
+    () -> oublierLorsque(client.émetteur, "message", fMessage)
 end
 
 function action(client::Client, adresseFonction::String, args::Dict)
@@ -80,17 +83,16 @@ function action(client::Client, adresseFonction::String)
     action(client, adresseFonction, Dict())
 end
 
-function suivre(f::Function, client::Client, adresseFonction::String, args::Dict{String, Any})
+function suivre(f::Function, client::Client, adresseFonction::String, args::Dict, nomArgFonction::String="f")
     # Créer requète
-    id = UUIDs.uuidv4()
-    nomArgFonction = 
+    id = string(UUIDs.uuid4())
     requète = Dict([
         ("id", id), ("type", "suivre"), ("fonction", split(adresseFonction, ".")), ("args", args),
         ("nomArgFonction", nomArgFonction)
     ])
-
+    
     # Créer écoute réponse suivrePrêt sur client
-    suiviPrêt = attendreRéponse(client, id, "suiviPrêt")
+    suiviPrêt = attendreRéponse(client, id, "suivrePrêt")
     
     # Créer écoute réponse données sur client
     oublierÉcoute = suivreRéponse(client, id, "suivre") do réponse
@@ -102,13 +104,12 @@ function suivre(f::Function, client::Client, adresseFonction::String, args::Dict
 
     # Attendre réponse requète et rendre la fonction oublier
     wait(suiviPrêt)
-    
-    # Rendre fonction oublier
-    requèteOublier = Dict([
-        ("type", "retour"), ("id", id), ("fonction", "fOublier")
-    ])
 
+    # Rendre fonction oublier
     function fOublier()
+        requèteOublier = Dict([
+            ("type", "retour"), ("id", id), ("fonction", "fOublier")
+        ])
         write(client.ws, JSON.json(requèteOublier))
         oublierÉcoute()
     end
