@@ -14,6 +14,7 @@ WebSockets = "104b5d7c-a370-577a-8038-80a2059c5097"
 
 [compat]
 JSON = "0.21"
+DataFrames = "1"
 WebSockets = "1"
 julia = "1"
 
