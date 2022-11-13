@@ -34,7 +34,10 @@ jobs:
       - uses: actions/setup-node@v1.4.4
         with:
           node-version: 16
-      - run: npm add -g pnpm && pnpm add -g @constl/ipa @constl/serveur
+      - uses: pnpm/action-setup@v2.2.4
+        with:
+          version: latest
+      - run: pnpm add -g @constl/ipa @constl/serveur
       - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
