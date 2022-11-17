@@ -25,6 +25,10 @@ avecServeurTest() do (port)
 
         Constellation.action(client, "bds.ajouterNomsBd", Dict([("id", idBd), ("noms", Dict([("हिं", "मौसम")]))]))
         @test !haskey(dicNoms, "हिं")
+
+        nomsUneFois = Constellation.suivreUneFois(client, "bds.suivreNomsBd", Dict([("id", idBd)]))
+        @test nomsUneFois["हिं"] == "मौसम"
+
     end
 end
 
@@ -34,7 +38,7 @@ end
 
 fOublier()
 
-nomsUneFois = Constellation.suivreUneFois(client, "bds.suivreNomsBd")
+
 Constellation.rechercher(client, "recherche.rechercherVariablesSelonNom")
 
 données = Constellation.obtDonnéesTableau(client, idTableau)

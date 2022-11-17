@@ -116,17 +116,16 @@ function suivre(f::Function, client::Client, adresseFonction::String, args::Dict
 end
 
 
-function suivreUneFois(client::Client, adresseFonction::String, args::Dict{String, Any})
-    # Créer condition écoute
-    cond = Condition()
+function suivreUneFois(client::Client, adresseFonction::String, args::Dict)
+    # Créer variable pour recevoir le résultat
+    résultat = nothing
 
     # Appeler suivre
-    fOublier = suivre(client, adresseFonction, args) do résultat
-        notify(cond, résultat)
+    fOublier = suivre(client, adresseFonction, args) do données
+        résultat = données
     end
     
     # Lorsque première réponse, annuler tout
-    résultat = wait(cond)
     fOublier()
     
     # Rendre la réponse
