@@ -1,4 +1,4 @@
-include("utils.jl")
+include("../utils.jl")
 
 avecServeurTest() do (port)
     Constellation.avecClient(port) do client
@@ -13,16 +13,16 @@ avecServeurTest() do (port)
         Constellation.action(client, "bds.ajouterNomsBd", Dict([("id", idBd), ("noms", Dict([("fr", "Météo"), ("த", "காலநிலை")]))]))
         
         dicNoms = Dict([])
-        fOublier = Constellation.suivre(client, "bds.suivreNomsBd", Dict([("id", idBd)])) do noms
+        réponse = Constellation.suivre(client, "bds.suivreNomsBd", Dict([("id", idBd)])) do noms
             dicNoms = noms
         end
         @test dicNoms["fr"] == "Météo" && dicNoms["த"] == "காலநிலை"
         
         Constellation.action(client, "bds.ajouterNomsBd", Dict([("id", idBd), ("noms", Dict([("es", "Meteo")]))]))
         @test dicNoms["es"] == "Meteo"
-
-        fOublier()
-
+        
+        réponse["fOublier"]()
+        
         Constellation.action(client, "bds.ajouterNomsBd", Dict([("id", idBd), ("noms", Dict([("हिं", "मौसम")]))]))
         @test !haskey(dicNoms, "हिं")
 
@@ -31,16 +31,3 @@ avecServeurTest() do (port)
 
     end
 end
-
-"""
-
-
-
-fOublier()
-
-
-Constellation.rechercher(client, "recherche.rechercherVariablesSelonNom")
-
-données = Constellation.obtDonnéesTableau(client, idTableau)
-# donnéesRéseau = Constellation.obtDonnéesRéseau()
-"""

@@ -40,6 +40,8 @@ function attendreRéponse(client::Client, id::AbstractString, type::AbstractStri
             oublierLorsque(client.émetteur, "message", f)
             if "résultat" in keys(message)
                 notify(cond, message["résultat"])
+            elseif "fonctions" in keys(message)
+                notify(cond, message["fonctions"])
             else
                 notify(cond)
             end
@@ -103,7 +105,7 @@ function suivre(f::Function, client::Client, adresseFonction::String, args::Dict
     write(client.ws, JSON.json(requète))
 
     # Attendre réponse requète et rendre la fonction oublier
-    wait(suiviPrêt)
+    retour = wait(suiviPrêt)
 
     # Rendre fonction oublier
     function fOublier()
@@ -113,6 +115,17 @@ function suivre(f::Function, client::Client, adresseFonction::String, args::Dict
         write(client.ws, JSON.json(requèteOublier))
         oublierÉcoute()
     end
+
+    réponse = Dict([("fOublier", fOublier)])
+    if retour != nothing
+        for fn in retour
+            if fn != "fOublier"
+                réponse[fn] = (args) => write(client.ws, JSON.json(Dict([("type", "retour"), ("id", id), ("fonction", fn), ("args", args)])))
+            end
+        end
+    end
+
+    réponse
 end
 
 
@@ -121,27 +134,21 @@ function suivreUneFois(client::Client, adresseFonction::String, args::Dict)
     résultat = nothing
 
     # Appeler suivre
-    fOublier = suivre(client, adresseFonction, args) do données
+    retour = suivre(client, adresseFonction, args) do données
         résultat = données
     end
     
     # Lorsque première réponse, annuler tout
-    fOublier()
+    retour["fOublier"]()
     
     # Rendre la réponse
     résultat
 end
 
-function recherche()
-
-end
-
-function rechercherUneFois()
-
-end
-
 function obtDonnéesTableau(client::Client, idTableau::String)
-    suivreUneFois(client, "tableaux.suivreDonnées", args=Dict([("idTableau", idTableau)]))
+    données = suivreUneFois(client, "tableaux.suivreDonnées", args=Dict([("idTableau", idTableau)]))
+    
+    DataFrames.DataFrame(données)
 end
 
 function obtDonnéesRéseau()
