@@ -36,14 +36,18 @@ function attendreRéponse(client::Client, id::AbstractString, type::AbstractStri
     cond = Condition()
 
     f(message) = begin
-        if message["id"] == id && message["type"] == type
-            oublierLorsque(client.émetteur, "message", f)
-            if "résultat" in keys(message)
-                notify(cond, message["résultat"])
-            elseif "fonctions" in keys(message)
-                notify(cond, message["fonctions"])
-            else
-                notify(cond)
+        if message["id"] == id 
+            if message["type"] == "erreur"
+                notify(cond , message["erreur"], error=true)
+            elseif message["type"] == type
+                oublierLorsque(client.émetteur, "message", f)
+                if "résultat" in keys(message)
+                    notify(cond, message["résultat"])
+                elseif "fonctions" in keys(message)
+                    notify(cond, message["fonctions"])
+                else
+                    notify(cond)
+                end
             end
         end
     end
@@ -116,16 +120,15 @@ function suivre(f::Function, client::Client, adresseFonction::String, args::Dict
         oublierÉcoute()
     end
 
-    réponse = Dict([("fOublier", fOublier)])
-    if retour != nothing
-        for fn in retour
-            if fn != "fOublier"
-                réponse[fn] = (args) => write(client.ws, JSON.json(Dict([("type", "retour"), ("id", id), ("fonction", fn), ("args", args)])))
-            end
+    function générerFRéponse(fn::AbstractString) 
+        function fRéponse(args)
+            requèteRéponse = Dict([("type", "retour"), ("id", id), ("fonction", fn), ("args", args)])
+            write(client.ws, JSON.json(requèteRéponse))
         end
+
     end
 
-    réponse
+    merge(Dict([("fOublier", fOublier)]), retour == nothing ? Dict([]) : Dict(fn=>générerFRéponse(fn) for fn in retour if fn != "fOublier"))
 end
 
 
@@ -145,7 +148,7 @@ function suivreUneFois(client::Client, adresseFonction::String, args::Dict)
     résultat
 end
 
-function obtDonnéesTableau(client::Client, idTableau::String)
+function obtDonnéesTableau(client::Client, idTableau::AbstractString)
     données = suivreUneFois(client, "tableaux.suivreDonnées", args=Dict([("idTableau", idTableau)]))
     
     DataFrames.DataFrame(données)
