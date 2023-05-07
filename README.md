@@ -30,7 +30,7 @@ Ce paquet est tout nouveau et n'est pas encore publié sur le dépôt de paquets
 pkg> add https://github.com/reseau-constellation/Constellation.jl.git
 ```
 
-Vous devrez également installer Constellation elle-même (vous aurez besoin de [Node.js](https://nodejs.org/fr/) et [pnpm](https://pnpm.io/), si vous ne l'avez pas déjà):
+Vous devrez également installer Constellation elle-même, soit l'[interface graphique](https://réseau-constellation.ca/t%C3%A9l%C3%A9chargements) (le plus facile), soit par la ligne de commande (vous aurez besoin de [Node.js](https://nodejs.org/fr/) et [pnpm](https://pnpm.io/), si vous ne l'avez pas déjà):
 
 ```sh
 $ npm add -g pnpm
