@@ -40,7 +40,7 @@ $ pnpm add -g @constl/ipa @constl/serveur
 Et voilà !
 
 ## Guide
-On vous recommande la documentation complète. Mais en bref, toutes les fonctionnalités de Constellation sont disponsibles.
+On vous recommande la [documentation complète](https://docu.réseau-constellation.ca/avanc%C3%A9/autresLangages/julia.html). Mais en bref, toutes les fonctionnalités de Constellation sont disponsibles.
 
 ```julia
 import Constellation
