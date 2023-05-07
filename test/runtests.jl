@@ -14,4 +14,8 @@ using Test
         include("client/testRecherche.jl")
     end
 
+    @testset "Client : fonctions spéciales" begin
+        include("client/testFonctionsSpéciales.jl")
+    end
+
 end
