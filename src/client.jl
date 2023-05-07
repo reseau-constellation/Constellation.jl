@@ -148,14 +148,55 @@ function suivreUneFois(client::Client, adresseFonction::String, args::Dict)
     résultat
 end
 
-function obtDonnéesTableau(client::Client, idTableau::AbstractString)
-    données = suivreUneFois(client, "tableaux.suivreDonnées", args=Dict([("idTableau", idTableau)]))
-    
-    DataFrames.DataFrame(données)
+function obtDonnéesTableau(client::Client, idTableau::AbstractString, langues::Vector{AbstractString} = AbstractString[])
+    données = suivreUneFois(client, "tableaux.suivreDonnées", Dict([("idTableau", idTableau), ("clefsSelonVariables", true)]))
+    variables = filter(
+        x -> x ≠ "id", 
+        unique(collect(Iterators.flatten(map((x) -> keys(x["données"]), données))))
+    )
+    rangées = map((x) -> x["données"], données)
+
+    nomsVariables = Dict(
+        map(
+            v -> (
+                v, 
+                suivreUneFois(
+                    client, "variables.suivreNomsVariable", Dict([("id", v)])
+                )
+            ),
+            variables
+        )
+    )
+
+    function trouverNom(v::AbstractString)
+        languesDisponibles = collect(keys(nomsVariables[v]))
+
+        languesParPréférence = sort(
+            languesDisponibles,
+            by = x -> isnothing(findfirst(==(x), langues)) ? findfirst(==(x), langues) : Inf
+        )
+        nomsVariables[v][languesParPréférence[1]]
+    end
+
+    function nommerColonnes(rangée::Dict)
+        Dict(
+            map(
+                (c) -> (trouverNom(c), rangée[c]),
+                collect(filter(x -> x ≠ "id", keys(rangée)))
+            )
+        )
+    end
+
+    rangéesAvecNoms = map(
+        nommerColonnes,
+        rangées
+    )
+
+    DataFrames.DataFrame(rangéesAvecNoms)
 end
 
 function obtDonnéesRéseau(client::Client, idNuée::AbstractString)
-    données = suivreUneFois(client, "nuées.suivreDonnéesNuée", args=Dict([("idNuée", idNuée)]))
+    données = suivreUneFois(client, "nuées.suivreDonnéesNuée", Dict([("idNuée", idNuée)]))
 
     DataFrames.DataFrame(données)
 end
