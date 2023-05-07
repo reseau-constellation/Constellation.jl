@@ -18,7 +18,7 @@ function lancerServeur(;port::Int=0, exe::AbstractString="constl", dossierOrbite
     proc = open(Cmd(commande))
     while true
         sortie = readline(proc)
-        if occursin("Serveur prêt sur port :", sortie)
+        if occursin(":", sortie)
             portFinal = parse(Int, split(sortie, ":")[2])
             return (portFinal, ()->kill(proc))
         end
