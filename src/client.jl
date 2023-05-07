@@ -154,6 +154,8 @@ function obtDonnéesTableau(client::Client, idTableau::AbstractString)
     DataFrames.DataFrame(données)
 end
 
-function obtDonnéesRéseau()
+function obtDonnéesRéseau(client::Client, idNuée::AbstractString)
+    données = suivreUneFois(client, "nuées.suivreDonnéesNuée", args=Dict([("idNuée", idNuée)]))
 
+    DataFrames.DataFrame(données)
 end
