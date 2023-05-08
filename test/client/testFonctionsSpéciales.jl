@@ -6,7 +6,7 @@ avecServeurTest() do (port)
     Constellation.avecClient(port) do client
         idBd = Constellation.action(client, "bds.créerBd", Dict([("licence", "ODbl-1_0")]))
         idTableau = Constellation.action(client, "bds.ajouterTableauBd", Dict([("idBd", idBd)]))
-
+        
         idVarPrécip = Constellation.action(
             client, "variables.créerVariable", Dict([("catégorie", "numérique")])
         )
@@ -30,7 +30,7 @@ avecServeurTest() do (port)
             donnéesTableau,
             DataFrames.DataFrame([Dict([("Précipitation", 12.3), ("id", donnéesTableau[1, "id"])])])
         )
-        
+
         # En spécifiant la langue
         Constellation.action(
             client, 
@@ -55,13 +55,14 @@ avecServeurTest() do (port)
             client, 
             "tableaux.ajouterÉlément", Dict([("idTableau", idTableau), ("vals", Dict([(idColPrécip, 4), (idColTempé, 14.5)]))])
         )
+        
         donnéesTableauVarSansNom = Constellation.obtDonnéesTableau(client, idTableau, ["த"])
 
         @test isequal(
             donnéesTableauVarSansNom,
             DataFrames.DataFrame([Dict([("மழை", 12.3), (idVarTempé, nothing), ("id", donnéesTableauVarSansNom[1, "id"])]), Dict([("மழை", 4), (idVarTempé, 14.5), ("id", donnéesTableauVarSansNom[2, "id"])])])
         )
-
+        
     end
 end
 
@@ -108,19 +109,20 @@ avecServeurTest() do (port)
                 ("idBd", idBd), ("clefTableau", clefTableau), ("vals", Dict([(idColTempé, 12.3), (idColPrécip, 4.5)]))
             ])
         )
-        
+
         donnéesRéseau = Constellation.obtDonnéesNuée(client, idNuée, clefTableau, ["fr"])
+        référence = DataFrames.DataFrame([
+            Dict([
+                ("Compte", idCompte),
+                ("id", donnéesRéseau[1, "id"]),
+                ("Précipitation", 4.5),
+                (idVarTempé, 12.3)
+            ])
+        ])
 
         @test isequal(
             donnéesRéseau,
-            DataFrames.DataFrame([
-                Dict([
-                    ("Compte", idCompte),
-                    ("id", donnéesRéseau[1, "id"]),
-                    ("Précipitation", 4.5),
-                    (idVarTempé, 12.3)
-                ])
-            ])
+            référence
         )
     end
 end

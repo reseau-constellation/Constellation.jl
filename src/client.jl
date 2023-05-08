@@ -38,7 +38,7 @@ function attendreRéponse(client::Client, id::AbstractString, type::AbstractStri
     f(message) = begin
         if message["id"] == id 
             if message["type"] == "erreur"
-                notify(cond , message["erreur"], error=true)
+                notify(cond, message["erreur"], error=true)
             elseif message["type"] == type
                 oublierLorsque(client.émetteur, "message", f)
                 if "résultat" in keys(message)
@@ -132,27 +132,36 @@ function suivre(f::Function, client::Client, adresseFonction::String, args::Dict
 end
 
 
-function suivreUneFois(client::Client, adresseFonction::String, args::Dict)
+function suivreUneFois(client::Client, adresseFonction::String, args::Dict, condition::Function=x->true)
     # Créer variable pour recevoir le résultat
     résultat = nothing
+    cond = Base.Event()
 
     # Appeler suivre
     retour = suivre(client, adresseFonction, args) do données
         résultat = données
+        if condition(données)
+            notify(cond)
+        end
     end
-    
+
+    # Rendre la réponse
+    wait(cond)
+
     # Lorsque première réponse, annuler tout
     retour["fOublier"]()
-    
-    # Rendre la réponse
+
     résultat
 end
 
 function résoudreNomsColonnes(client::Client, données::Vector{Dict{String, Any}}, langues::Vector{String})
+    # Extraire les ids des variables
     variables = filter(
         x -> startswith(x, "/orbitdb"), 
         unique(collect(Iterators.flatten(map((x) -> keys(x), données))))
     )
+
+    # Rechercher les noms des variables
     nomsVariables = Dict(
         map(
             v -> (
@@ -166,20 +175,27 @@ function résoudreNomsColonnes(client::Client, données::Vector{Dict{String, Any
     )
 
     function trouverNom(v::AbstractString)
+        # Trouver le nom d'une variable selon les langues préférées
+
+        # Si ce n'est pas une variable, il n'y a rien à faire
         if !(v in keys(nomsVariables))
             return v
         end
 
+        # Langues disponibles pour la variable
         languesDisponibles = collect(keys(nomsVariables[v]))
 
+        # Langues disponible en ordre de préférence
         languesParPréférence = sort(
             languesDisponibles,
             by = x -> isnothing(findfirst(==(x), langues)) ? Inf : findfirst(==(x), langues)
         )
 
+        # Rendre le nom traduit, si possible
         if length(languesParPréférence) > 0
             return nomsVariables[v][languesParPréférence[1]]
         else
+            # Si pas possible, rendre l'id de la variable
             return v
         end
     end
@@ -188,7 +204,7 @@ function résoudreNomsColonnes(client::Client, données::Vector{Dict{String, Any
         Dict(
             map(
                 (c) -> (trouverNom(c), c in keys(rangée) ? rangée[c] : nothing),
-                vcat(collect(keys(rangée)), variables)
+                unique(vcat(collect(keys(rangée)), variables))
             )
         )
     end
@@ -207,13 +223,17 @@ function obtDonnéesTableau(client::Client, idTableau::AbstractString, langues::
 end
 
 function obtDonnéesNuée(client::Client, idNuée::AbstractString, clefTableau::AbstractString, langues::Vector{String} = String[], nRésultatsDésirés::Int = 1000)
+    fCond(x) = begin
+        length(keys(x)) > 0
+    end
     donnéesNuée = suivreUneFois(
         client, 
         "nuées.suivreDonnéesTableauNuée", 
-        Dict([("idNuée", idNuée), ("clefTableau", clefTableau), ("nRésultatsDésirés", nRésultatsDésirés), ("clefsSelonVariables", true)])
+        Dict([("idNuée", idNuée), ("clefTableau", clefTableau), ("nRésultatsDésirés", nRésultatsDésirés), ("clefsSelonVariables", true)]),
+        fCond
     )
 
-    données = map(
+    données::Vector{Dict{String, Any}} = map(
         x -> merge(x["élément"]["données"], Dict([("Compte", x["idBdCompte"])])),
         donnéesNuée
     )
