@@ -67,6 +67,60 @@ end
 
 avecServeurTest() do (port)
     Constellation.avecClient(port) do client
-        # donnéesRéseau = Constellation.obtDonnéesNuée(client, idNuée)
+        idCompte = Constellation.action(client, "obtIdCompte")
+
+        idNuée = Constellation.action(client, "nuées.créerNuée")
+        clefTableau = "tableau pricipal"
+        idTableau = Constellation.action(client, "nuées.ajouterTableauNuée", Dict([("idNuée", idNuée), ("clefTableau", clefTableau)]))
+
+        idVarPrécip = Constellation.action(
+            client, "variables.créerVariable", Dict([("catégorie", "numérique")])
+        )
+        idVarTempé = Constellation.action(
+            client, "variables.créerVariable", Dict([("catégorie", "numérique")])
+        )
+        Constellation.action(
+            client, 
+            "variables.ajouterNomsVariable", 
+            Dict([("id", idVarPrécip), ("noms", Dict([("fr", "Précipitation"), ("த", "மழை")]))])
+        )
+        idColPrécip = Constellation.action(
+            client, 
+            "nuées.ajouterColonneTableauNuée", Dict([("idTableau", idTableau), ("idVariable", idVarPrécip)])
+        )
+        idColTempé = Constellation.action(
+            client, 
+            "nuées.ajouterColonneTableauNuée", Dict([("idTableau", idTableau), ("idVariable", idVarTempé)])
+        )
+        
+        schéma = Constellation.action(
+            client, 
+            "nuées.générerSchémaBdNuée", Dict([("idNuée", idNuée), ("licence", "ODbl-1_0")])
+        )
+        idBd = Constellation.action(
+            client, 
+            "bds.créerBdDeSchéma", Dict([("schéma", schéma)])
+        )
+        Constellation.action(
+            client, 
+            "bds.ajouterÉlémentÀTableauParClef", 
+            Dict([
+                ("idBd", idBd), ("clefTableau", clefTableau), ("vals", Dict([(idColTempé, 12.3), (idColPrécip, 4.5)]))
+            ])
+        )
+        
+        donnéesRéseau = Constellation.obtDonnéesNuée(client, idNuée, clefTableau, ["fr"])
+
+        @test isequal(
+            donnéesRéseau,
+            DataFrames.DataFrame([
+                Dict([
+                    ("Compte", idCompte),
+                    ("id", donnéesRéseau[1, "id"]),
+                    ("Précipitation", 4.5),
+                    (idVarTempé, 12.3)
+                ])
+            ])
+        )
     end
 end

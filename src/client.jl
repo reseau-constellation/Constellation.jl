@@ -148,14 +148,11 @@ function suivreUneFois(client::Client, adresseFonction::String, args::Dict)
     résultat
 end
 
-function obtDonnéesTableau(client::Client, idTableau::AbstractString, langues::Vector{String} = String[])
-    données = suivreUneFois(client, "tableaux.suivreDonnées", Dict([("idTableau", idTableau), ("clefsSelonVariables", true)]))
+function résoudreNomsColonnes(client::Client, données::Vector{Dict{String, Any}}, langues::Vector{String})
     variables = filter(
-        x -> x ≠ "id", 
-        unique(collect(Iterators.flatten(map((x) -> keys(x["données"]), données))))
+        x -> startswith(x, "/orbitdb"), 
+        unique(collect(Iterators.flatten(map((x) -> keys(x), données))))
     )
-    rangées = map((x) -> x["données"], données)
-
     nomsVariables = Dict(
         map(
             v -> (
@@ -169,6 +166,10 @@ function obtDonnéesTableau(client::Client, idTableau::AbstractString, langues::
     )
 
     function trouverNom(v::AbstractString)
+        if !(v in keys(nomsVariables))
+            return v
+        end
+
         languesDisponibles = collect(keys(nomsVariables[v]))
 
         languesParPréférence = sort(
@@ -183,25 +184,40 @@ function obtDonnéesTableau(client::Client, idTableau::AbstractString, langues::
         end
     end
 
-    function nommerColonnes(rangée::Dict)
+    function nommerColonnes(rangée::Dict{String, Any})
         Dict(
             map(
                 (c) -> (trouverNom(c), c in keys(rangée) ? rangée[c] : nothing),
-                variables
+                vcat(collect(keys(rangée)), variables)
             )
         )
     end
 
-    rangéesAvecNoms = map(
+    map(
         nommerColonnes,
-        rangées
+        données
     )
-
-    DataFrames.DataFrame(rangéesAvecNoms)
 end
 
-function obtDonnéesRéseau(client::Client, idNuée::AbstractString)
-    données = suivreUneFois(client, "nuées.suivreDonnéesNuée", Dict([("idNuée", idNuée)]))
+function obtDonnéesTableau(client::Client, idTableau::AbstractString, langues::Vector{String} = String[])
+    données = suivreUneFois(client, "tableaux.suivreDonnées", Dict([("idTableau", idTableau), ("clefsSelonVariables", true)]))
+    
+    donnéesAvecNoms = résoudreNomsColonnes(client, map((x) -> x["données"], données), langues)
+    DataFrames.DataFrame(donnéesAvecNoms)
+end
 
-    DataFrames.DataFrame(données)
+function obtDonnéesNuée(client::Client, idNuée::AbstractString, clefTableau::AbstractString, langues::Vector{String} = String[], nRésultatsDésirés::Int = 1000)
+    donnéesNuée = suivreUneFois(
+        client, 
+        "nuées.suivreDonnéesTableauNuée", 
+        Dict([("idNuée", idNuée), ("clefTableau", clefTableau), ("nRésultatsDésirés", nRésultatsDésirés), ("clefsSelonVariables", true)])
+    )
+
+    données = map(
+        x -> merge(x["élément"]["données"], Dict([("Compte", x["idBdCompte"])])),
+        donnéesNuée
+    )
+    donnéesAvecNoms = résoudreNomsColonnes(client, données, langues)
+
+    DataFrames.DataFrame(donnéesAvecNoms)
 end
