@@ -28,7 +28,7 @@ avecServeurTest() do (port)
         donnéesTableau = Constellation.obtDonnéesTableau(client, idTableau)
         @test isequal(
             donnéesTableau,
-            DataFrames.DataFrame([Dict([("Précipitation", 12.3)])])
+            DataFrames.DataFrame([Dict([("Précipitation", 12.3), ("id", donnéesTableau[1, "id"])])])
         )
         
         # En spécifiant la langue
@@ -40,7 +40,7 @@ avecServeurTest() do (port)
         donnéesTableauLangue = Constellation.obtDonnéesTableau(client, idTableau, ["த", "fr"])
         @test isequal(
             donnéesTableauLangue,
-            DataFrames.DataFrame([Dict([("மழை", 12.3)])])
+            DataFrames.DataFrame([Dict([("மழை", 12.3), ("id", donnéesTableauLangue[1, "id"])])])
         )
 
         # Variable sans nom
@@ -59,7 +59,7 @@ avecServeurTest() do (port)
 
         @test isequal(
             donnéesTableauVarSansNom,
-            DataFrames.DataFrame([Dict([("மழை", 12.3), (idVarTempé, nothing)]), Dict([("மழை", 4), (idVarTempé, 14.5)])])
+            DataFrames.DataFrame([Dict([("மழை", 12.3), (idVarTempé, nothing), ("id", donnéesTableauVarSansNom[1, "id"])]), Dict([("மழை", 4), (idVarTempé, 14.5), ("id", donnéesTableauVarSansNom[2, "id"])])])
         )
 
     end
