@@ -186,8 +186,8 @@ function obtDonnéesTableau(client::Client, idTableau::AbstractString, langues::
     function nommerColonnes(rangée::Dict)
         Dict(
             map(
-                (c) -> (trouverNom(c), rangée[c]),
-                collect(filter(x -> x ≠ "id", keys(rangée)))
+                (c) -> (trouverNom(c), c in keys(rangée) ? rangée[c] : nothing),
+                variables
             )
         )
     end
