@@ -1,3 +1,5 @@
+import DataFrames
+
 include("../utils.jl")
 
 avecServeurTest() do (port)
@@ -24,11 +26,22 @@ avecServeurTest() do (port)
 
         # Sans spécifier la langue
         donnéesTableau = Constellation.obtDonnéesTableau(client, idTableau)
-        println("données tableau", donnéesTableau)
+        @test isequal(
+            donnéesTableau,
+            DataFrames.DataFrame([Dict([("Précipitation", 12.3)])])
+        )
         
         # En spécifiant la langue
-        # donnéesTableauLangue = Constellation.obtDonnéesTableau(client, idTableau, ["த", "fr"])
-        # println("données tableau langue", donnéesTableauLangue)
+        Constellation.action(
+            client, 
+            "variables.ajouterNomsVariable", 
+            Dict([("id", idVariable), ("noms", Dict([("த", "மழை")]))])
+        )
+        donnéesTableauLangue = Constellation.obtDonnéesTableau(client, idTableau, ["த", "fr"])
+        @test isequal(
+            donnéesTableauLangue,
+            DataFrames.DataFrame([Dict([("மழை", 12.3)])])
+        )
 
         # donnéesRéseau = Constellation.obtDonnéesNuée(client, idNuée)
 

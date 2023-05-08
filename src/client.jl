@@ -148,7 +148,7 @@ function suivreUneFois(client::Client, adresseFonction::String, args::Dict)
     résultat
 end
 
-function obtDonnéesTableau(client::Client, idTableau::AbstractString, langues::Vector{AbstractString} = AbstractString[])
+function obtDonnéesTableau(client::Client, idTableau::AbstractString, langues::Vector{String} = String[])
     données = suivreUneFois(client, "tableaux.suivreDonnées", Dict([("idTableau", idTableau), ("clefsSelonVariables", true)]))
     variables = filter(
         x -> x ≠ "id", 
@@ -173,9 +173,14 @@ function obtDonnéesTableau(client::Client, idTableau::AbstractString, langues::
 
         languesParPréférence = sort(
             languesDisponibles,
-            by = x -> isnothing(findfirst(==(x), langues)) ? findfirst(==(x), langues) : Inf
+            by = x -> isnothing(findfirst(==(x), langues)) ? Inf : findfirst(==(x), langues)
         )
-        nomsVariables[v][languesParPréférence[1]]
+
+        if length(languesParPréférence) > 0
+            return nomsVariables[v][languesParPréférence[1]]
+        else
+            return v
+        end
     end
 
     function nommerColonnes(rangée::Dict)
