@@ -6,7 +6,7 @@ version = Constellation.obtVersionServeur()
 
 # Vérifier lancement du serveur sur port spécifié
 Base.Filesystem.mktempdir() do dossier
-    Constellation.avecServeur(5002, dossierOrbite=dossier, dossierSFIP=dossier) do port
+    Constellation.avecServeur(port=5002, dossierOrbite=dossier, dossierSFIP=dossier) do port
         @test port == 5002
     end
 end
