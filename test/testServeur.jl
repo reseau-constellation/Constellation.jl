@@ -4,17 +4,14 @@ include("utils.jl")
 version = Constellation.obtVersionServeur()
 @test versionValide(version)
 
-# Vérifier lancement du serveur sur port libre
-Constellation.avecServeur() do port
-    @test isa(port, Int)
-end
-
 # Vérifier lancement du serveur sur port spécifié
-Constellation.avecServeur(5002) do port
-    @test port == 5002
+Base.Filesystem.mktempdir() do dossier
+    Constellation.avecServeur(5002, dossierOrbite=dossier, dossierSFIP=dossier) do port
+        @test port == 5002
+    end
 end
 
-# Vérifier lancement du serveur sur dossier spécifique
+# Vérifier lancement du serveur sur port libre et dossier spécifique
 Base.Filesystem.mktempdir() do dossier
     Constellation.avecServeur(dossierOrbite=dossier, dossierSFIP=dossier) do port
         @test isa(port, Int)
