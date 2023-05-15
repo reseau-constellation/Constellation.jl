@@ -24,11 +24,12 @@
 </p>
 
 ## Installation
-Ce paquet est tout nouveau et n'est pas encore publié sur le dépôt de paquets Julia. Mais si vous êtes impatiente, vous pouvez l'installer ainsi :
+Vous pouvez l'installer ainsi :
 
 ```
-pkg> add https://github.com/reseau-constellation/Constellation.jl.git
+pkg> add Constellation
 ```
+
 
 Vous devrez également installer Constellation elle-même, soit l'[interface graphique](https://réseau-constellation.ca/t%C3%A9l%C3%A9chargements) (le plus facile), soit par la ligne de commande (vous aurez besoin de [Node.js](https://nodejs.org/fr/) et [pnpm](https://pnpm.io/), si vous ne l'avez pas déjà):
 
