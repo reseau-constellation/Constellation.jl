@@ -12,7 +12,7 @@
 <p align="center">
     <a href="https://codecov.io/gh/reseau-constellation/Constellation.jl" > 
         <img 
-            src="https://codecov.io/gh/reseau-constellation/Constellation.jl/branch/main/graph/badge.svg?token=1HbFsyDC8y" alt="Statut tests"
+            src="https://codecov.io/gh/reseau-constellation/Constellation.jl/branch/principale/graph/badge.svg?token=1HbFsyDC8y" alt="Statut tests"
         /> 
     </a>
     <a href="https://github.com/reseau-constellation/Constellation.jl/actions/workflows/CI.yml" > 
