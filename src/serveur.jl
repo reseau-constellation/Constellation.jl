@@ -6,7 +6,8 @@ end
 
 
 function lancerServeur(;port::Int=0, exe::AbstractString="constl", dossierOrbite::AbstractString="", dossierSFIP::AbstractString="")
-    commande = [exe, "lancer", "-m"]
+    commande = [exe, "lancer", "-m"]  # Activer mode communication machine avec `-m`
+    
     if port != 0
         push!(commande, "--port", string(port))
     end
