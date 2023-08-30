@@ -54,7 +54,7 @@ Constellation.avecServeur() do port
         # Écrire tout le reste de son code ici
 
         # Par exemple :
-        idCompte = Constellation.action(client, "obtIdDispositif")
+        idCompte = Constellation.action(client, "obtIdCompte")
         @test occursin("orbitdb", idCompte)
 
         idBd = Constellation.action(client, "bds.créerBd", Dict([("licence", "ODbl-1_0")]))
