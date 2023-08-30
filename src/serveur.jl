@@ -43,11 +43,6 @@ function lancerServeur(;port::Int=0, exe::AbstractString="constl", dossierOrbite
     end
 end
 
-function lancerServeur(
-    port::Int=0, exe::AbstractString="constl", dossierOrbite::AbstractString="", dossierSFIP::AbstractString=""
-)
-    lancerServeur(port=port, exe=exe, dossierOrbite=dossierOrbite, dossierSFIP=dossierSFIP)
-end
 
 function avecServeur(
     f::Function,
@@ -56,11 +51,4 @@ function avecServeur(
     (port, fermerServeur) = lancerServeur(port=port, exe=exe, dossierOrbite=dossierOrbite, dossierSFIP=dossierSFIP)
     f((port))
     fermerServeur()
-end
-
-function avecServeur(
-    f::Function,
-    port::Int=0, exe::AbstractString="constl", dossierOrbite::AbstractString="", dossierSFIP::AbstractString=""
-)
-    avecServeur(f, port=port, exe=exe, dossierOrbite=dossierOrbite, dossierSFIP=dossierSFIP)
 end
