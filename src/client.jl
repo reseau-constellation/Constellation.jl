@@ -167,7 +167,7 @@ function résoudreNomsColonnes(client::Client, données::Vector{Dict{String, Any
             v -> (
                 v, 
                 suivreUneFois(
-                    client, "variables.suivreNomsVariable", Dict([("id", v)])
+                    client, "variables.suivreNomsVariable", Dict([("idVariable", v)])
                 )
             ),
             variables
@@ -234,7 +234,7 @@ function obtDonnéesNuée(client::Client, idNuée::AbstractString, clefTableau::
     )
 
     données::Vector{Dict{String, Any}} = map(
-        x -> merge(x["élément"]["données"], Dict([("Compte", x["idBdCompte"])])),
+        x -> merge(x["élément"]["données"], Dict([("Compte", x["idCompte"])])),
         donnéesNuée
     )
     donnéesAvecNoms = résoudreNomsColonnes(client, données, langues)

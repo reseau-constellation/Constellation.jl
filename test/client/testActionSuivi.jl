@@ -13,26 +13,26 @@ avecServeurTest() do (port)
 
         # Fonction suivi
         idTableau = Constellation.action(client, "bds.ajouterTableauBd", Dict([("idBd", idBd)]))
-        Constellation.action(client, "bds.ajouterNomsBd", Dict([("id", idBd), ("noms", Dict([("fr", "Météo"), ("த", "காலநிலை")]))]))
+        Constellation.action(client, "bds.sauvegarderNomsBd", Dict([("idBd", idBd), ("noms", Dict([("fr", "Météo"), ("த", "காலநிலை")]))]))
         
         dicNoms = Dict([])
-        réponse = Constellation.suivre(client, "bds.suivreNomsBd", Dict([("id", idBd)])) do noms
+        réponse = Constellation.suivre(client, "bds.suivreNomsBd", Dict([("idBd", idBd)])) do noms
             dicNoms = noms
         end
         @test dicNoms["fr"] == "Météo" && dicNoms["த"] == "காலநிலை"
         
         # Suivi reste réactif
-        Constellation.action(client, "bds.ajouterNomsBd", Dict([("id", idBd), ("noms", Dict([("es", "Meteo")]))]))
+        Constellation.action(client, "bds.sauvegarderNomsBd", Dict([("idBd", idBd), ("noms", Dict([("es", "Meteo")]))]))
         @test dicNoms["es"] == "Meteo"
         
         réponse["fOublier"]()  # Annuler suivi
         
         # Suivi n'est plus réactif après `fOublier()`
-        Constellation.action(client, "bds.ajouterNomsBd", Dict([("id", idBd), ("noms", Dict([("हिं", "मौसम")]))]))
+        Constellation.action(client, "bds.sauvegarderNomsBd", Dict([("idBd", idBd), ("noms", Dict([("हिं", "मौसम")]))]))
         @test !haskey(dicNoms, "हिं")
 
         # Suivi une seule fois
-        nomsUneFois = Constellation.suivreUneFois(client, "bds.suivreNomsBd", Dict([("id", idBd)]))
+        nomsUneFois = Constellation.suivreUneFois(client, "bds.suivreNomsBd", Dict([("idBd", idBd)]))
         @test nomsUneFois["हिं"] == "मौसम"
 
         # Erreur si la fonction n'existe pas

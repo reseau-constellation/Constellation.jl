@@ -12,8 +12,8 @@ avecServeurTest() do (port)
         )
         Constellation.action(
             client, 
-            "variables.ajouterNomsVariable", 
-            Dict([("id", idVarPrécip), ("noms", Dict([("fr", "Précipitation")]))])
+            "variables.sauvegarderNomsVariable", 
+            Dict([("idVariable", idVarPrécip), ("noms", Dict([("fr", "Précipitation")]))])
         )
         idColPrécip = Constellation.action(
             client, 
@@ -34,8 +34,8 @@ avecServeurTest() do (port)
         # En spécifiant la langue
         Constellation.action(
             client, 
-            "variables.ajouterNomsVariable", 
-            Dict([("id", idVarPrécip), ("noms", Dict([("த", "மழை")]))])
+            "variables.sauvegarderNomsVariable", 
+            Dict([("idVariable", idVarPrécip), ("noms", Dict([("த", "மழை")]))])
         )
         donnéesTableauLangue = Constellation.obtDonnéesTableau(client, idTableau, ["த", "fr"])
         @test isequal(
@@ -82,8 +82,8 @@ avecServeurTest() do (port)
         )
         Constellation.action(
             client, 
-            "variables.ajouterNomsVariable", 
-            Dict([("id", idVarPrécip), ("noms", Dict([("fr", "Précipitation"), ("த", "மழை")]))])
+            "variables.sauvegarderNomsVariable", 
+            Dict([("idVariable", idVarPrécip), ("noms", Dict([("fr", "Précipitation"), ("த", "மழை")]))])
         )
         idColPrécip = Constellation.action(
             client, 
