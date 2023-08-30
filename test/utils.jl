@@ -31,4 +31,4 @@ function attendreDossierExiste(dossier::AbstractString)
     end
 end
 
-export versionValide, estNumérique, lancerServeurTest, avecServeurTest
+export versionValide, estNumérique, avecServeurTest
