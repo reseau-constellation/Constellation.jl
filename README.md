@@ -10,17 +10,17 @@
 
 <p align="center">Un client Julia pour communiquer avec le réseau Constellation.</p>
 <p align="center">
-    <a href="https://codecov.io/gh/reseau-constellation/Constellation.jl" > 
-        <img 
-            src="https://codecov.io/gh/reseau-constellation/Constellation.jl/branch/principale/graph/badge.svg?token=1HbFsyDC8y" alt="Statut tests"
-        /> 
-    </a>
-    <a href="https://github.com/reseau-constellation/Constellation.jl/actions/workflows/CI.yml" > 
-        <img 
-            src="https://github.com/reseau-constellation/Constellation.jl/actions/workflows/CI.yml/badge.svg"
-            alt="Couverture tests"
-        /> 
-    </a>
+  <a href="https://github.com/reseau-constellation/Constellation.jl/actions/workflows/CI.yml" > 
+    <img 
+        src="https://github.com/reseau-constellation/Constellation.jl/actions/workflows/CI.yml/badge.svg?branch=principale"
+        alt="Couverture tests"
+    /> 
+  </a>
+  <a href="https://codecov.io/gh/reseau-constellation/Constellation.jl" > 
+      <img 
+          src="https://codecov.io/gh/reseau-constellation/Constellation.jl/branch/principale/graph/badge.svg?token=1HbFsyDC8y" alt="Statut tests"
+      /> 
+  </a>
 </p>
 
 ## Installation
