@@ -26,9 +26,15 @@ avecServeurTest() do (port)
 
         # Sans spécifier la langue
         donnéesTableau = Constellation.obtDonnéesTableau(client, idTableau)
+
+        ## Créer un tableau de référence et assurer que les colonnes sont dans le bon ordre
+        référenceTableau = DataFrames.DataFrame([Dict([("Précipitation", 12.3), ("id", donnéesTableau[1, "id"])])])
+        DataFrames.select!(donnéesTableau,circshift(names(référenceTableau),1))
+        DataFrames.select!(référenceTableau,circshift(names(référenceTableau),1))
+
         @test isequal(
             donnéesTableau,
-            DataFrames.DataFrame([Dict([("Précipitation", 12.3), ("id", donnéesTableau[1, "id"])])])
+            référenceTableau
         )
 
         # En spécifiant la langue
@@ -38,9 +44,15 @@ avecServeurTest() do (port)
             Dict([("idVariable", idVarPrécip), ("noms", Dict([("த", "மழை")]))])
         )
         donnéesTableauLangue = Constellation.obtDonnéesTableau(client, idTableau, ["த", "fr"])
+        
+        ## Créer un tableau de référence et assurer que les colonnes sont dans le bon ordre
+        référenceTableauLangue = DataFrames.DataFrame([Dict([("மழை", 12.3), ("id", donnéesTableauLangue[1, "id"])])])
+        DataFrames.select!(donnéesTableauLangue,circshift(names(référenceTableauLangue),1))
+        DataFrames.select!(référenceTableauLangue,circshift(names(référenceTableauLangue),1))
+
         @test isequal(
             donnéesTableauLangue,
-            DataFrames.DataFrame([Dict([("மழை", 12.3), ("id", donnéesTableauLangue[1, "id"])])])
+            référenceTableauLangue
         )
 
         # Variable sans nom
@@ -57,10 +69,18 @@ avecServeurTest() do (port)
         )
         
         donnéesTableauVarSansNom = Constellation.obtDonnéesTableau(client, idTableau, ["த"])
+        
+        ## Créer un tableau de référence et assurer que les colonnes sont dans le bon ordre
+        référenceVarSansNom = DataFrames.DataFrame([
+            Dict([("மழை", 12.3), (idVarTempé, nothing), ("id", donnéesTableauVarSansNom[1, "id"])]), 
+            Dict([("மழை", 4), (idVarTempé, 14.5), ("id", donnéesTableauVarSansNom[2, "id"])])
+        ])
+        DataFrames.select!(donnéesTableauVarSansNom,circshift(names(référenceVarSansNom),1))
+        DataFrames.select!(référenceVarSansNom,circshift(names(référenceVarSansNom),1))
 
         @test isequal(
             donnéesTableauVarSansNom,
-            DataFrames.DataFrame([Dict([("மழை", 12.3), (idVarTempé, nothing), ("id", donnéesTableauVarSansNom[1, "id"])]), Dict([("மழை", 4), (idVarTempé, 14.5), ("id", donnéesTableauVarSansNom[2, "id"])])])
+            référenceVarSansNom
         )
         
     end
@@ -119,6 +139,10 @@ avecServeurTest() do (port)
                 (idVarTempé, 12.3)
             ])
         ])
+
+        ## Créer un tableau de référence et assurer que les colonnes sont dans le bon ordre
+        DataFrames.select!(donnéesRéseau,circshift(names(référence),1))
+        DataFrames.select!(référence,circshift(names(référence),1))
 
         @test isequal(
             donnéesRéseau,
