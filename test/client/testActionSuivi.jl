@@ -19,10 +19,12 @@ avecServeurTest() do (port)
         réponse = Constellation.suivre(client, "bds.suivreNomsBd", Dict([("idBd", idBd)])) do noms
             dicNoms = noms
         end
+        sleep(2)
         @test dicNoms["fr"] == "Météo" && dicNoms["த"] == "காலநிலை"
         
         # Suivi reste réactif
         Constellation.action(client, "bds.sauvegarderNomsBd", Dict([("idBd", idBd), ("noms", Dict([("es", "Meteo")]))]))
+        sleep(2)
         @test dicNoms["es"] == "Meteo"
         
         réponse["fOublier"]()  # Annuler suivi

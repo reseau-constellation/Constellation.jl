@@ -21,6 +21,7 @@ avecServeurTest() do (port)
         Constellation.action(client, "variables.sauvegarderNomsVariable", Dict([("idVariable", variables[1]), ("noms", Dict([("fr", "Humidite")]))]))
         Constellation.action(client, "variables.sauvegarderNomsVariable", Dict([("idVariable", variables[2]), ("noms", Dict([("fr", "humidite")]))]))
         
+        sleep(2)
         @test [r["id"] for r in résultatsRecherche] == [variables[2], variables[1]]
 
         # Diminuer N
@@ -31,6 +32,7 @@ avecServeurTest() do (port)
 
         # Améliorer résultat recherche
         Constellation.action(client, "variables.sauvegarderNomsVariable", Dict([("idVariable", variables[3]), ("noms", Dict([("fr", "humidité")]))]))
+        sleep(2)
         @test résultatsRecherche[1]["id"] == variables[3]
 
         # Augmenter N
