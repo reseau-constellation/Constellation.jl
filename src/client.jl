@@ -216,13 +216,16 @@ function résoudreNomsColonnes(client::Client, données::Vector{Dict{String, Any
 end
 
 function obtDonnéesTableau(client::Client, idTableau::AbstractString, langues::Vector{String} = String[])
-    données = suivreUneFois(client, "tableaux.suivreDonnées", Dict([("idTableau", idTableau), ("clefsSelonVariables", true)]))
-    
-    donnéesAvecNoms = résoudreNomsColonnes(client, map((x) -> x["données"], données), langues)
+    donnéesTableau = suivreUneFois(client, "tableaux.suivreDonnées", Dict([("idTableau", idTableau), ("clefsSelonVariables", true)]))
+    données::Vector{Dict{String, Any}} = map((x) -> x["données"], donnéesTableau)
+
+    donnéesAvecNoms = résoudreNomsColonnes(client, données, langues)
     DataFrames.DataFrame(donnéesAvecNoms)
 end
 
-function obtDonnéesNuée(client::Client, idNuée::AbstractString, clefTableau::AbstractString, langues::Vector{String} = String[], nRésultatsDésirés::Int = 1000)
+function obtDonnéesNuée(
+    client::Client, idNuée::AbstractString, clefTableau::AbstractString, langues::Vector{String} = String[], nRésultatsDésirés::Int = 1000
+)
     fCond(x) = begin
         length(keys(x)) > 0
     end

@@ -28,7 +28,7 @@ avecServeurTest() do (port)
         donnéesTableau = Constellation.obtDonnéesTableau(client, idTableau)
 
         ## Créer un tableau de référence et assurer que les colonnes sont dans le bon ordre
-        référenceTableau = DataFrames.DataFrame([Dict([("Précipitation", 12.3), ("id", donnéesTableau[1, "id"])])])
+        référenceTableau = DataFrames.DataFrame([Dict([("Précipitation", 12.3)])])
         DataFrames.select!(donnéesTableau,circshift(names(référenceTableau),1))
         DataFrames.select!(référenceTableau,circshift(names(référenceTableau),1))
 
@@ -44,9 +44,9 @@ avecServeurTest() do (port)
             Dict([("idVariable", idVarPrécip), ("noms", Dict([("த", "மழை")]))])
         )
         donnéesTableauLangue = Constellation.obtDonnéesTableau(client, idTableau, ["த", "fr"])
-        
+
         ## Créer un tableau de référence et assurer que les colonnes sont dans le bon ordre
-        référenceTableauLangue = DataFrames.DataFrame([Dict([("மழை", 12.3), ("id", donnéesTableauLangue[1, "id"])])])
+        référenceTableauLangue = DataFrames.DataFrame([Dict([("மழை", 12.3)])])
         DataFrames.select!(donnéesTableauLangue,circshift(names(référenceTableauLangue),1))
         DataFrames.select!(référenceTableauLangue,circshift(names(référenceTableauLangue),1))
 
@@ -63,17 +63,20 @@ avecServeurTest() do (port)
             client, 
             "tableaux.ajouterColonneTableau", Dict([("idTableau", idTableau), ("idVariable", idVarTempé)])
         )
-        Constellation.action(
+        x = Constellation.action(
             client, 
-            "tableaux.ajouterÉlément", Dict([("idTableau", idTableau), ("vals", Dict([(idColPrécip, 4), (idColTempé, 14.5)]))])
+            "tableaux.ajouterÉlément", Dict([
+                ("idTableau", idTableau), 
+                ("vals", Dict([(idColPrécip, 4), (idColTempé, 14.5)]))
+            ])
         )
-        
+
         donnéesTableauVarSansNom = Constellation.obtDonnéesTableau(client, idTableau, ["த"])
         
         ## Créer un tableau de référence et assurer que les colonnes sont dans le bon ordre
         référenceVarSansNom = DataFrames.DataFrame([
-            Dict([("மழை", 12.3), (idVarTempé, nothing), ("id", donnéesTableauVarSansNom[1, "id"])]), 
-            Dict([("மழை", 4), (idVarTempé, 14.5), ("id", donnéesTableauVarSansNom[2, "id"])])
+            Dict([("மழை", 12.3), (idVarTempé, nothing)]), 
+            Dict([("மழை", 4), (idVarTempé, 14.5)])
         ])
         DataFrames.select!(donnéesTableauVarSansNom,circshift(names(référenceVarSansNom),1))
         DataFrames.select!(référenceVarSansNom,circshift(names(référenceVarSansNom),1))
@@ -91,7 +94,7 @@ avecServeurTest() do (port)
         idCompte = Constellation.action(client, "obtIdCompte")
 
         idNuée = Constellation.action(client, "nuées.créerNuée")
-        clefTableau = "tableau pricipal"
+        clefTableau = "tableau principal"
         idTableau = Constellation.action(client, "nuées.ajouterTableauNuée", Dict([("idNuée", idNuée), ("clefTableau", clefTableau)]))
 
         idVarPrécip = Constellation.action(
@@ -113,6 +116,7 @@ avecServeurTest() do (port)
             client, 
             "nuées.ajouterColonneTableauNuée", Dict([("idTableau", idTableau), ("idVariable", idVarTempé)])
         )
+        sleep(2)
         
         schéma = Constellation.action(
             client, 
@@ -134,7 +138,6 @@ avecServeurTest() do (port)
         référence = DataFrames.DataFrame([
             Dict([
                 ("Compte", idCompte),
-                ("id", donnéesRéseau[1, "id"]),
                 ("Précipitation", 4.5),
                 (idVarTempé, 12.3)
             ])
