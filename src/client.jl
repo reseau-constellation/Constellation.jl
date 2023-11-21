@@ -89,11 +89,16 @@ function action(client::Client, adresseFonction::String)
     action(client, adresseFonction, Dict())
 end
 
-function suivre(f::Function, client::Client, adresseFonction::String, args::Dict, nomArgFonction::String="f")
+function suivre(
+    f::Function, client::Client, adresseFonction::String, args::Dict, nomArgFonction::String="f"
+)
     # Créer requète
     id = string(UUIDs.uuid4())
     requète = Dict([
-        ("id", id), ("type", "suivre"), ("fonction", split(adresseFonction, ".")), ("args", args),
+        ("id", id), 
+        ("type", "suivre"), 
+        ("fonction", split(adresseFonction, ".")), 
+        ("args", args),
         ("nomArgFonction", nomArgFonction)
     ])
     
@@ -128,7 +133,10 @@ function suivre(f::Function, client::Client, adresseFonction::String, args::Dict
 
     end
 
-    merge(Dict([("fOublier", fOublier)]), retour == nothing ? Dict([]) : Dict(fn=>générerFRéponse(fn) for fn in retour if fn != "fOublier"))
+    merge(
+        Dict([("fOublier", fOublier)]), 
+        retour == nothing ? Dict([]) : Dict(fn=>générerFRéponse(fn) for fn in retour if fn != "fOublier")
+    )
 end
 
 
@@ -154,93 +162,74 @@ function suivreUneFois(client::Client, adresseFonction::String, args::Dict, cond
     résultat
 end
 
-function résoudreNomsColonnes(client::Client, données::Vector{Dict{String, Any}}, langues::Vector{String})
-    # Extraire les ids des variables
-    variables = filter(
-        x -> startswith(x, "/orbitdb"), 
-        unique(collect(Iterators.flatten(map((x) -> keys(x), données))))
-    )
+function attendreStable(n::Int)
+    cond = Base.Event()
+    déjàAppelé = false;
+    précédente = Dict([("val", "nothing")]);
 
-    # Rechercher les noms des variables
-    nomsVariables = Dict(
-        map(
-            v -> (
-                v, 
-                suivreUneFois(
-                    client, "variables.suivreNomsVariable", Dict([("idVariable", v)])
-                )
-            ),
-            variables
-        )
-    )
-
-    function trouverNom(v::AbstractString)
-        # Trouver le nom d'une variable selon les langues préférées
-
-        # Si ce n'est pas une variable, il n'y a rien à faire
-        if !(v in keys(nomsVariables))
-            return v
+    function attendre(val::Any)
+        if (déjàAppelé &&  val == JSON.string(précédente["val"])) 
+            return false
         end
-
-        # Langues disponibles pour la variable
-        languesDisponibles = collect(keys(nomsVariables[v]))
-
-        # Langues disponible en ordre de préférence
-        languesParPréférence = sort(
-            languesDisponibles,
-            by = x -> isnothing(findfirst(==(x), langues)) ? Inf : findfirst(==(x), langues)
-        )
-
-        # Rendre le nom traduit, si possible
-        if length(languesParPréférence) > 0
-            return nomsVariables[v][languesParPréférence[1]]
-        else
-            # Si pas possible, rendre l'id de la variable
-            return v
-        end
+        déjàAppelé = true;
+ 
+        précédente["val"] = JSON.string(val)
+        t = Timer((x::Timer)->notify(cond), n)
+        wait(cond)
+        close(t)
+        précédente["val"] == JSON.string(val)
     end
+end
 
-    function nommerColonnes(rangée::Dict{String, Any})
-        Dict(
-            map(
-                (c) -> (trouverNom(c), c in keys(rangée) ? rangée[c] : nothing),
-                unique(vcat(collect(keys(rangée)), variables))
+function donnéesÀTableau(données):: DataFrames.DataFrame
+    toutesLesColonnes = unique(
+        collect(
+            Iterators.flatten(
+                map(
+                    d -> collect(keys(d)),
+                    données,
+                )
             )
         )
-    end
-
-    map(
-        nommerColonnes,
-        données
     )
+    foreach(
+        d -> foreach(
+            c -> if (!haskey(d, c)) d[c] = nothing end,
+            toutesLesColonnes,
+        ),
+        données,
+    )
+    DataFrames.DataFrame(données)
 end
 
 function obtDonnéesTableau(client::Client, idTableau::AbstractString, langues::Vector{String} = String[])
-    donnéesTableau = suivreUneFois(client, "tableaux.suivreDonnées", Dict([("idTableau", idTableau), ("clefsSelonVariables", true)]))
-    données::Vector{Dict{String, Any}} = map((x) -> x["données"], donnéesTableau)
+    donnéesTableau = suivreUneFois(
+        client, 
+        "tableaux.suivreDonnéesExportation", 
+        Dict([("idTableau", idTableau), ("langues", langues)]), 
+        attendreStable(1)
+    )
 
-    donnéesAvecNoms = résoudreNomsColonnes(client, données, langues)
-    DataFrames.DataFrame(donnéesAvecNoms)
+    donnéesÀTableau(donnéesTableau["données"])
 end
 
-function obtDonnéesNuée(
-    client::Client, idNuée::AbstractString, clefTableau::AbstractString, langues::Vector{String} = String[], nRésultatsDésirés::Int = 1000
+function obtDonnéesTableauNuée(
+    client::Client, 
+    idNuée::AbstractString, 
+    clefTableau::AbstractString, 
+    langues::Vector{String} = String[], 
+    nRésultatsDésirés::Int = 1000
 )
-    fCond(x) = begin
-        length(keys(x)) > 0
-    end
     donnéesNuée = suivreUneFois(
-        client, 
-        "nuées.suivreDonnéesTableauNuée", 
-        Dict([("idNuée", idNuée), ("clefTableau", clefTableau), ("nRésultatsDésirés", nRésultatsDésirés), ("clefsSelonVariables", true)]),
-        fCond
+        client,
+        "nuées.suivreDonnéesExportationTableau",
+        Dict([
+            ("idNuée", idNuée), 
+            ("clefTableau", clefTableau), 
+            ("langues", langues), 
+            ("nRésultatsDésirés", nRésultatsDésirés)
+        ]),
     )
 
-    données::Vector{Dict{String, Any}} = map(
-        x -> merge(x["élément"]["données"], Dict([("Compte", x["idCompte"])])),
-        donnéesNuée
-    )
-    donnéesAvecNoms = résoudreNomsColonnes(client, données, langues)
-
-    DataFrames.DataFrame(donnéesAvecNoms)
+    donnéesÀTableau(donnéesNuée["données"])
 end

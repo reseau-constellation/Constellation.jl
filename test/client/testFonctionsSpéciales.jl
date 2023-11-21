@@ -28,7 +28,8 @@ avecServeurTest() do (port)
         donnéesTableau = Constellation.obtDonnéesTableau(client, idTableau)
 
         ## Créer un tableau de référence et assurer que les colonnes sont dans le bon ordre
-        référenceTableau = DataFrames.DataFrame([Dict([("Précipitation", 12.3)])])
+        référenceTableau = DataFrames.DataFrame([Dict([(idColPrécip, 12.3)])])
+
         DataFrames.select!(donnéesTableau,circshift(names(référenceTableau),1))
         DataFrames.select!(référenceTableau,circshift(names(référenceTableau),1))
 
@@ -75,9 +76,10 @@ avecServeurTest() do (port)
         
         ## Créer un tableau de référence et assurer que les colonnes sont dans le bon ordre
         référenceVarSansNom = DataFrames.DataFrame([
-            Dict([("மழை", 12.3), (idVarTempé, nothing)]), 
-            Dict([("மழை", 4), (idVarTempé, 14.5)])
+            Dict([("மழை", 12.3), (idColTempé, nothing)]), 
+            Dict([("மழை", 4), (idColTempé, 14.5)])
         ])
+
         DataFrames.select!(donnéesTableauVarSansNom,circshift(names(référenceVarSansNom),1))
         DataFrames.select!(référenceVarSansNom,circshift(names(référenceVarSansNom),1))
 
@@ -134,16 +136,17 @@ avecServeurTest() do (port)
             ])
         )
 
-        donnéesRéseau = Constellation.obtDonnéesNuée(client, idNuée, clefTableau, ["fr"])
+        donnéesRéseau = Constellation.obtDonnéesTableauNuée(client, idNuée, clefTableau, ["fr"])
+
+        ## Créer un tableau de référence et assurer que les colonnes sont dans le bon ordre
         référence = DataFrames.DataFrame([
             Dict([
-                ("Compte", idCompte),
+                ("auteur", idCompte),
                 ("Précipitation", 4.5),
-                (idVarTempé, 12.3)
+                (idColTempé, 12.3)
             ])
         ])
 
-        ## Créer un tableau de référence et assurer que les colonnes sont dans le bon ordre
         DataFrames.select!(donnéesRéseau,circshift(names(référence),1))
         DataFrames.select!(référence,circshift(names(référence),1))
 
