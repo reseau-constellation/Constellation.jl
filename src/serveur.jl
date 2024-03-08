@@ -5,17 +5,14 @@ function obtVersionServeur(exe::AbstractString="constl")
 end
 
 
-function lancerServeur(;port::Int=0, exe::AbstractString="constl", dossierOrbite::AbstractString="", dossierSFIP::AbstractString="")
+function lancerServeur(;port::Int=0, exe::AbstractString="constl", dossier::AbstractString="")
     commande = [exe, "lancer", "-m"]  # Activer mode communication machine avec `-m`
     
     if port != 0
         push!(commande, "--port", string(port))
     end
-    if dossierSFIP != ""
-        push!(commande, "--doss-sfip", dossierSFIP)
-    end
-    if dossierOrbite != ""
-        push!(commande, "--doss-orbite", dossierOrbite)
+    if dossier != ""
+        push!(commande, "--dossier", dossier)
     end
 
     proc = open(Cmd(commande), read=true, write=true)
@@ -47,9 +44,9 @@ end
 
 function avecServeur(
     f::Function,
-    ;port::Int=0, exe::AbstractString="constl", dossierOrbite::AbstractString="", dossierSFIP::AbstractString=""
+    ;port::Int=0, exe::AbstractString="constl", dossier::AbstractString=""
 )
-    (port, fermerServeur) = lancerServeur(port=port, exe=exe, dossierOrbite=dossierOrbite, dossierSFIP=dossierSFIP)
+    (port, fermerServeur) = lancerServeur(port=port, exe=exe, dossier=dossier)
     f((port))
     fermerServeur()
 end

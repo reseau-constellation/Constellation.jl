@@ -17,7 +17,7 @@ end
 
 function avecServeurTest(f::Function)
     Base.Filesystem.mktempdir() do dossier
-        Constellation.avecServeur(dossierOrbite=dossier, dossierSFIP=dossier) do port
+        Constellation.avecServeur(dossier=dossier) do port
             f(port)
         end
     end
