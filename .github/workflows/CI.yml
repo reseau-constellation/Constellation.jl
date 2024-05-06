@@ -37,7 +37,7 @@ jobs:
         with:
           version: latest
       - run: pnpm add -g @constl/ipa @constl/serveur
-      - uses: julia-actions/cache@v1
+      - uses: julia-actions/cache@v2
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
