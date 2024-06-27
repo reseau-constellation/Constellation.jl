@@ -15,7 +15,7 @@ Notez le numéro du port ; vous devrez le passer au client Julia.
 Vous pouvez également lancer un serveur à partir d'un processus Julia :
 
 ```julia
-(port, fFermerServeur) = Constellation.lancerServeur()
+(port, codeSecret, fFermerServeur) = Constellation.lancerServeur()
 
 # Lorsque vous en avez assez vu :
 fFermerServeur()
@@ -32,8 +32,8 @@ Vous pouvez aussi lancer un nœud Constellation temporaire qui se fermera automa
 ```julia
 import Constellation
 
-Constellation.avecServeur() do port
-    Constellation.avecClient(port) do client
+Constellation.avecServeur() do port, codeSecret
+    Constellation.avecClient(port, codeSecret) do client
         # Écrire tout le reste de son code ici
     end
 end

@@ -1,7 +1,7 @@
 include("../utils.jl")
 
-avecServeurTest() do (port)
-    Constellation.avecClient(port) do client
+avecServeurTest() do port, codeSecret
+    Constellation.avecClient(port, codeSecret) do client
         
         # Action sans arguments
         idCompte = Constellation.action(client, "obtIdCompte")

@@ -1,7 +1,7 @@
 include("../utils.jl")
 
-avecServeurTest() do (port)
-    Constellation.avecClient(port) do client
+avecServeurTest() do port, codeSecret
+    Constellation.avecClient(port, codeSecret) do client
         
         # Créer 5 variables pour rechercher
         variables = [Constellation.action(client, "variables.créerVariable", Dict([("catégorie", "numérique")])) for _ in 1:4]

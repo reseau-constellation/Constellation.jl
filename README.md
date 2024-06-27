@@ -47,10 +47,10 @@ On vous recommande la [documentation complète](https://docu.réseau-constellati
 import Constellation
 
 # D'abord, lancer le nœud local
-Constellation.avecServeur() do port
+Constellation.avecServeur() do port, codeSecret
 
     # 
-    Constellation.avecClient(port) do client
+    Constellation.avecClient(port, codeSecret) do client
         # Écrire tout le reste de son code ici
 
         # Par exemple :

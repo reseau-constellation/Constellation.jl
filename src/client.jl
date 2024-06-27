@@ -8,15 +8,16 @@ include("utils/événements.jl")
 
 mutable struct Client
     port::Int
+    codeSecret::String
     émetteur::Émetteur
     ws::WebSockets.WebSocket{Sockets.TCPSocket}
-    Client(;port, émetteur) = new(port, émetteur)
+    Client(;port, codeSecret, émetteur) = new(port, codeSecret, émetteur)
 end
 
-function avecClient(f::Function, port::Int)
-    client = Client(;port=port, émetteur=Émetteur())
+function avecClient(f::Function, port::Int, codeSecret::String)
+    client = Client(;port=port, codeSecret=codeSecret, émetteur=Émetteur())
 
-    WebSockets.open(string("ws://localhost:", port)) do ws_client
+    WebSockets.open(string("ws://localhost:", port, "?code=", codeSecret)) do ws_client
         client.ws = ws_client
         @async begin
             while true
@@ -135,7 +136,7 @@ function suivre(
 
     merge(
         Dict([("fOublier", fOublier)]), 
-        retour == nothing ? Dict([]) : Dict(fn=>générerFRéponse(fn) for fn in retour if fn != "fOublier")
+        retour === nothing ? Dict([]) : Dict(fn=>générerFRéponse(fn) for fn in retour if fn != "fOublier")
     )
 end
 

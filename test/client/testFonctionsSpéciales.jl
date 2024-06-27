@@ -2,8 +2,8 @@ import DataFrames
 
 include("../utils.jl")
 
-avecServeurTest() do (port)
-    Constellation.avecClient(port) do client
+avecServeurTest() do port, codeSecret
+    Constellation.avecClient(port, codeSecret) do client
         idBd = Constellation.action(client, "bds.créerBd", Dict([("licence", "ODbl-1_0")]))
         idTableau = Constellation.action(client, "bds.ajouterTableauBd", Dict([("idBd", idBd)]))
         
@@ -91,8 +91,8 @@ avecServeurTest() do (port)
     end
 end
 
-avecServeurTest() do (port)
-    Constellation.avecClient(port) do client
+avecServeurTest() do port, codeSecret
+    Constellation.avecClient(port, codeSecret) do client
         idCompte = Constellation.action(client, "obtIdCompte")
 
         idNuée = Constellation.action(client, "nuées.créerNuée")

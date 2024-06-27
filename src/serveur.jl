@@ -35,7 +35,8 @@ function lancerServeur(;port::Int=0, exe::AbstractString="constl", dossier::Abst
             message = JSON.parse(split(sortie, "MESSAGE MACHINE :")[2])
             if (message["type"] == "NŒUD PRÊT")
                 portFinal = message["port"]
-                return (portFinal, fFermer)
+                codeSecret = message["codeSecret"]
+                return (portFinal, codeSecret, fFermer)
             end
         end
     end
@@ -44,9 +45,11 @@ end
 
 function avecServeur(
     f::Function,
-    ;port::Int=0, exe::AbstractString="constl", dossier::AbstractString=""
+    ;port::Int=0, 
+    exe::AbstractString="constl", 
+    dossier::AbstractString=""
 )
-    (port, fermerServeur) = lancerServeur(port=port, exe=exe, dossier=dossier)
-    f((port))
+    (port, codeSecret, fermerServeur) = lancerServeur(port=port, exe=exe, dossier=dossier)
+    f(port, codeSecret)
     fermerServeur()
 end

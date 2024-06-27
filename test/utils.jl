@@ -12,13 +12,13 @@ function versionValide(version::AbstractString)
 end
 
 function estNumérique(x)
-    return tryparse(Float64, x) != nothing
+    return tryparse(Float64, x) !== nothing
 end
 
 function avecServeurTest(f::Function)
     Base.Filesystem.mktempdir() do dossier
-        Constellation.avecServeur(dossier=dossier) do port
-            f(port)
+        Constellation.avecServeur(dossier=dossier) do port, codeSecret
+            f(port, codeSecret)
         end
     end
 end
