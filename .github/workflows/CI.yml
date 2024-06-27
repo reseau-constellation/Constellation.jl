@@ -5,6 +5,9 @@ on:
       - principale
     tags: ['*']
   pull_request:
+    branches:
+        - principale
+
 concurrency:
   # Skip intermediate builds: always.
   # Cancel intermediate builds: only if it is a pull request build.
