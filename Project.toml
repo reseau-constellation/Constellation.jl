@@ -1,7 +1,7 @@
 name = "Constellation"
 uuid = "12cd0da3-566c-4730-bd56-a37e9f18d9f8"
 authors = ["Julien Jean Malard-Adam <julien.malard@mail.mcgill.ca> et al."]
-version = "1.0.0"
+version = "1.1.0"
 
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
