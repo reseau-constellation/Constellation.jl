@@ -16,6 +16,7 @@ WebSockets = "104b5d7c-a370-577a-8038-80a2059c5097"
 [compat]
 DataFrames = "1"
 FileWatching = "1.9"
+HTTP = "1"
 JSON = "0.21"
 Logging = "1.9"
 Sockets = "1.9"
