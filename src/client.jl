@@ -3,6 +3,7 @@ import DataFrames
 import JSON
 import UUIDs
 import Sockets
+import HTTP
 
 include("utils/événements.jl")
 
@@ -17,7 +18,7 @@ end
 function avecClient(f::Function, port::Int, codeSecret::String)
     client = Client(;port=port, codeSecret=codeSecret, émetteur=Émetteur())
 
-    WebSockets.open(string("ws://localhost:", port, "?code=", codeSecret)) do ws_client
+    WebSockets.open(string("ws://localhost:", port, "?code=", HTTP.escapeuri(codeSecret))) do ws_client
         client.ws = ws_client
         @async begin
             while true
@@ -203,14 +204,13 @@ function donnéesÀTableau(données):: DataFrames.DataFrame
     DataFrames.DataFrame(données)
 end
 
-function obtDonnéesTableau(client::Client, idTableau::AbstractString, langues::Vector{String} = String[])
+function obtDonnéesTableau(client::Client, idTableau::AbstractString, langues::Union{Vector{String}, Nothing} = nothing)
     donnéesTableau = suivreUneFois(
         client, 
         "tableaux.suivreDonnéesExportation", 
         Dict([("idTableau", idTableau), ("langues", langues)]), 
         attendreStable(1)
     )
-
     donnéesÀTableau(donnéesTableau["données"])
 end
 
