@@ -34,11 +34,11 @@ function avecClient(f::Function, port::Int, codeSecret::String)
     end;
 end
 
-function attendreRéponse(client::Client, id::AbstractString, type::AbstractString)
+function attendreRéponse(client::Client, idRequête::AbstractString, type::AbstractString)
     cond = Condition()
 
     f(message) = begin
-        if message["id"] == id 
+        if message["idRequête"] == idRequête 
             if message["type"] == "erreur"
                 notify(cond, message["erreur"], error=true)
             elseif message["type"] == type
@@ -58,9 +58,9 @@ function attendreRéponse(client::Client, id::AbstractString, type::AbstractStri
     cond
 end
 
-function suivreRéponse(f::Function, client::Client, id::AbstractString, type::AbstractString)
+function suivreRéponse(f::Function, client::Client, idRequête::AbstractString, type::AbstractString)
     function fMessage(message)
-        if message["id"] == id && message["type"] == type
+        if message["idRequête"] == idRequête && message["type"] == type
             f(message["données"])
         end
     end
@@ -72,13 +72,13 @@ end
 
 function action(client::Client, adresseFonction::String, args::Dict)
     # Créer requète
-    id = string(UUIDs.uuid4())
+    idRequête = string(UUIDs.uuid4())
     requète = Dict([
-        ("type", "action"), ("fonction", split(adresseFonction, ".")), ("args", args), ("id", id)
+        ("type", "action"), ("fonction", split(adresseFonction, ".")), ("args", args), ("idRequête", idRequête)
     ])
 
     # Ajouter un écouteur au client
-    prêt = attendreRéponse(client, id, "action")
+    prêt = attendreRéponse(client, idRequête, "action")
     
     # Envoyer requète au client
     write(client.ws, JSON.json(requète))
@@ -95,9 +95,9 @@ function suivre(
     f::Function, client::Client, adresseFonction::String, args::Dict, nomArgFonction::String="f"
 )
     # Créer requète
-    id = string(UUIDs.uuid4())
+    idRequête = string(UUIDs.uuid4())
     requète = Dict([
-        ("id", id), 
+        ("idRequête", idRequête), 
         ("type", "suivre"), 
         ("fonction", split(adresseFonction, ".")), 
         ("args", args),
@@ -105,10 +105,10 @@ function suivre(
     ])
     
     # Créer écoute réponse suivrePrêt sur client
-    suiviPrêt = attendreRéponse(client, id, "suivrePrêt")
+    suiviPrêt = attendreRéponse(client, idRequête, "suivrePrêt")
     
     # Créer écoute réponse données sur client
-    oublierÉcoute = suivreRéponse(client, id, "suivre") do réponse
+    oublierÉcoute = suivreRéponse(client, idRequête, "suivre") do réponse
         f(réponse)
     end
     
@@ -121,7 +121,7 @@ function suivre(
     # Rendre fonction oublier
     function fOublier()
         requèteOublier = Dict([
-            ("type", "retour"), ("id", id), ("fonction", "fOublier")
+            ("type", "retour"), ("idRequête", idRequête), ("fonction", "fOublier")
         ])
         write(client.ws, JSON.json(requèteOublier))
         oublierÉcoute()
@@ -129,7 +129,7 @@ function suivre(
 
     function générerFRéponse(fn::AbstractString) 
         function fRéponse(args)
-            requèteRéponse = Dict([("type", "retour"), ("id", id), ("fonction", fn), ("args", args)])
+            requèteRéponse = Dict([("type", "retour"), ("idRequête", idRequête), ("fonction", fn), ("args", args)])
             write(client.ws, JSON.json(requèteRéponse))
         end
 
