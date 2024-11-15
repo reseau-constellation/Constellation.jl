@@ -15,6 +15,10 @@ mutable struct Client
     Client(;port, codeSecret, émetteur) = new(port, codeSecret, émetteur)
 end
 
+function avecClient(f::Function, port::Int)
+    codeSecret = demanderCodeSecret(port)
+    avecClient(f, port, codeSecret)
+end
 function avecClient(f::Function, port::Int, codeSecret::String)
     client = Client(;port=port, codeSecret=codeSecret, émetteur=Émetteur())
 
@@ -32,6 +36,13 @@ function avecClient(f::Function, port::Int, codeSecret::String)
         end 
         f(client)
     end;
+end
+
+function demanderCodeSecret(port::Int)
+    idDemande = string("Julia ", String(rand())) 
+    réponse = HTTP.get(string("http://localhost:", port, "/demande/", requête); query=["id" => idDemande])
+    
+    String(réponse.body)
 end
 
 function attendreRéponse(client::Client, idRequête::AbstractString, type::AbstractString)
