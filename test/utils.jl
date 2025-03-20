@@ -23,11 +23,20 @@ function avecServeurTest(f::Function)
     end
 end
 
+function avecServeurEtClientTest(f::Function)
+    Base.Filesystem.mktempdir() do dossier
+        Constellation.avecServeurEtClient(dossier=dossier) do port, codeSecret
+            f(port, codeSecret)
+        end
+    end
+end
+
 function attendreDossierExiste(dossier::AbstractString)
     while true
         if isdir(dossier)
             return
         end
+        sleep(0.1)
     end
 end
 

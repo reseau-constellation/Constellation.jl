@@ -20,3 +20,9 @@ Base.Filesystem.mktempdir() do dossier
         attendreDossierExiste(dossier)
     end
 end
+
+# Vérifier lancement du serveur et de client ensemble
+avecServeurEtClientTest() do client
+    idCompte = Constellation.action(client, "obtIdCompte")
+    @test occursin("orbitdb", idCompte)
+end

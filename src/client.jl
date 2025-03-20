@@ -45,7 +45,7 @@ function avecServeurEtClient(
     exe::AbstractString="constl", 
     dossier::AbstractString=""
 )
-    avecServeur(port, exe, dossier) do port, codeSecret
+    avecServeur(;port=port, exe=exe, dossier=dossier) do port, codeSecret
         avecClient(f, port, codeSecret)
     end
 end
