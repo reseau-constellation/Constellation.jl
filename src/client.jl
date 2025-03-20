@@ -6,6 +6,7 @@ import Sockets
 import HTTP
 
 include("utils/événements.jl")
+include("serveur.jl")
 
 mutable struct Client
     port::Int
@@ -36,6 +37,17 @@ function avecClient(f::Function, port::Int, codeSecret::String)
         end 
         f(client)
     end;
+end
+
+function avecServeurEtClient(
+    f::Function
+    ;port::Int=0, 
+    exe::AbstractString="constl", 
+    dossier::AbstractString=""
+)
+    avecServeur(port, exe, dossier) do port, codeSecret
+        avecClient(f, port, codeSecret)
+    end
 end
 
 function demanderCodeSecret(port::Int)
@@ -241,6 +253,7 @@ function obtDonnéesTableauNuée(
             ("langues", langues), 
             ("nRésultatsDésirés", nRésultatsDésirés)
         ]),
+        attendreStable(1)
     )
 
     donnéesÀTableau(donnéesNuée["données"])
