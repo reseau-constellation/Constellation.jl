@@ -25,8 +25,8 @@ end
 
 function avecServeurEtClientTest(f::Function)
     Base.Filesystem.mktempdir() do dossier
-        Constellation.avecServeurEtClient(dossier=dossier) do port, codeSecret
-            f(port, codeSecret)
+        Constellation.avecServeurEtClient(dossier=dossier) do client
+            f(client)
         end
     end
 end
