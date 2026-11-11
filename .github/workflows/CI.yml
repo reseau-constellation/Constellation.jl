@@ -46,7 +46,7 @@ jobs:
       - name: Installer le serveur local Constellation
         run: curl https://raw.githubusercontent.com/reseau-constellation/serveur-ws/principale/installer.cjs | node -
       
-      - uses: julia-actions/cache@v2
+      - uses: julia-actions/cache@v3
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
